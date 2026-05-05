@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warehouse - PT. Wiratama Mitra Abadi</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f8f8f6;--bg3:#f2f1ec;
+  --tx:#1a1a1a;--tx2:#5a5a56;--tx3:#9a9a96;
+  --bl:#e6f1fb;--blt:#185fa5;--blb:#378add;
+  --gr:#eaf3de;--grt:#3b6d11;--grb:#639922;
+  --rd:#fcebeb;--rdt:#a32d2d;--rdb:#e24b4a;
+  --am:#faeeda;--amt:#854f0b;--amb:#ba7517;
+  --brd:rgba(0,0,0,.1);--brdm:rgba(0,0,0,.18);
+  --r8:8px;--r12:12px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;color:var(--tx);background:var(--bg3);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 50%,#0d2340 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#fff;border-radius:16px;padding:40px 36px;width:360px;box-shadow:0 24px 80px rgba(0,0,0,.4)}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;justify-content:center}
+.login-logo img{width:52px;height:52px;object-fit:contain}
+.login-logo-text .t1{font-size:15px;font-weight:700;color:#1a1a1a;line-height:1.2}
+.login-logo-text .t2{font-size:11px;color:#666}
+.login-title{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:6px;text-align:center}
+.login-sub{font-size:12px;color:#888;text-align:center;margin-bottom:24px}
+.lf-group{margin-bottom:14px}
+.lf-group label{display:block;font-size:12px;color:#555;font-weight:500;margin-bottom:5px}
+.lf-group input,.lf-group select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;color:#1a1a1a;transition:border .15s;background:#fff}
+.lf-group input:focus,.lf-group select:focus{outline:none;border-color:#378add;box-shadow:0 0 0 3px rgba(55,138,221,.1)}
+.btn-login{width:100%;padding:11px;background:linear-gradient(135deg,#1a5fa5,#378add);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;transition:opacity .15s}
+.btn-login:hover{opacity:.88}
+.login-err{background:#fcebeb;color:#a32d2d;border:1px solid #e24b4a;border-radius:6px;padding:8px 12px;font-size:12px;margin-top:10px;display:none}
+.login-err.show{display:block}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:234px;height:100vh;background:var(--bg);border-right:.5px solid var(--brd);overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+.sidebar-logo{padding:16px 16px 14px;border-bottom:.5px solid var(--brd);display:flex;align-items:center;gap:10px}
+.sidebar-logo img{width:38px;height:38px;object-fit:contain;flex-shrink:0}
+.logo-texts .lt1{font-size:12px;font-weight:700;color:var(--tx);line-height:1.3}
+.logo-texts .lt2{font-size:10px;color:var(--tx2);margin-top:1px}
+.user-pill{margin:10px 12px;background:var(--bl);border:.5px solid var(--blb);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between}
+.user-pill .up-name{font-size:12px;font-weight:600;color:var(--blt)}
+.user-pill .up-role{font-size:10px;color:var(--tx2)}
+.up-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--blt);color:#fff}
+.nav-section{padding:10px 8px 4px}
+.nav-label{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;padding:0 8px 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r8);cursor:pointer;font-size:13px;color:var(--tx2);margin-bottom:1px;transition:all .12s;user-select:none}
+.nav-item:hover{background:var(--bg2);color:var(--tx)}
+.nav-item.active{background:var(--bl);color:var(--blt);font-weight:500}
+.nav-item.hidden{display:none}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:10px 12px;border-top:.5px solid var(--brd)}
+.btn-logout{width:100%;padding:8px;background:var(--rd);border:.5px solid var(--rdb);color:var(--rdt);border-radius:var(--r8);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .12s}
+.btn-logout:hover{opacity:.8}
+
+/* ── MAIN ── */
+.main{margin-left:234px;padding:26px;min-height:100vh}
+.page{display:none}.page.active{display:block}
+.page-header{margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.page-title{font-size:20px;font-weight:600;color:var(--tx)}
+.page-sub{font-size:13px;color:var(--tx2);margin-top:3px}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
+.stat-card{background:var(--bg);border:.5px solid var(--brd);border-radius:var(--r12);padding:18px}
+.stat-label{font-size:12px;color:var(--tx2);margin-bottom:8px}
+.stat-val{font-size:28px;font-weight:600;color:var(--tx)}
+.stat-val.green{color:var(--grt)}.stat-val.red{color:var(--rdt)}.stat-val.blue{color:var(--blt)}
+
+/* ── CARDS ── */
+.card{background:var(--bg);border:.5px solid var(--brd);border-radius:var(--r12);overflow:hidden;margin-bottom:16px}
+.card-header{padding:13px 18px;border-bottom:.5px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:14px;font-weight:500}
+.card-body{padding:18px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r8);border:.5px solid var(--brdm);background:var(--bg);color:var(--tx);font-size:13px;cursor:pointer;transition:all .12s;font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--bl);border-color:var(--blb);color:var(--blt);font-weight:500}
+.btn.primary:hover{opacity:.88}
+.btn.danger{background:var(--rd);border-color:var(--rdb);color:var(--rdt)}
+.btn.success{background:var(--gr);border-color:var(--grb);color:var(--grt)}
+.btn.sm{padding:4px 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── FORMS ── */
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+label{font-size:12px;color:var(--tx2);font-weight:500}
+input,select,textarea{padding:8px 11px;border:.5px solid var(--brdm);border-radius:var(--r8);background:var(--bg);color:var(--tx);font-size:13px;font-family:inherit;transition:border .12s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blb);box-shadow:0 0 0 3px rgba(55,138,221,.08)}
+input[readonly]{background:var(--bg2);color:var(--tx2)}
+textarea{resize:vertical;min-height:62px}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+th{padding:9px 12px;text-align:left;font-weight:500;font-size:11px;color:var(--tx2);background:var(--bg2);border-bottom:.5px solid var(--brd);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+td{padding:10px 12px;border-bottom:.5px solid var(--brd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.stok-low td:first-child{border-left:3px solid var(--rdb)}
+.stok-ok td:first-child{border-left:3px solid var(--grb)}
+.actions{display:flex;gap:4px;white-space:nowrap}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge.green{background:var(--gr);color:var(--grt)}
+.badge.red{background:var(--rd);color:var(--rdt)}
+.badge.blue{background:var(--bl);color:var(--blt)}
+.badge.amber{background:var(--am);color:var(--amt)}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--r12);border:.5px solid var(--brd);width:760px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-header{padding:15px 22px;border-bottom:.5px solid var(--brd);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg);z-index:1}
+.modal-title{font-size:15px;font-weight:500}
+.modal-body{padding:22px}
+.modal-footer{padding:14px 22px;border-top:.5px solid var(--brd);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--bg)}
+.close-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--tx2);padding:3px 7px;border-radius:6px;line-height:1}
+.close-btn:hover{background:var(--bg2)}
+
+/* ── ALERTS ── */
+.alert{padding:10px 14px;border-radius:var(--r8);font-size:13px;margin-bottom:14px;display:none}
+.alert.show{display:block}
+.alert.success{background:var(--gr);color:var(--grt);border:.5px solid var(--grb)}
+.alert.danger{background:var(--rd);color:var(--rdt);border:.5px solid var(--rdb)}
+
+/* ── MISC ── */
+.hint-text{font-size:11px;margin-top:3px}
+.hint-found{color:var(--grt)}.hint-new{color:var(--blt)}
+.user-readonly-note{background:var(--am);color:var(--amt);border:.5px solid var(--amb);border-radius:var(--r8);padding:8px 14px;font-size:12px;margin-bottom:14px}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADBAMEDASIAAhEBAxEB/8QAHAABAAMBAQEBAQAAAAAAAAAAAAUGBwQDAgEI/8QARRAAAQMCBAMEBgQKCgMAAAAAAQACAwQRBQYhMRJBUQcTYXEUIoGRobEjMlKyFSZCYmVygqPB0SQzNTZjdJKis/BFg8L/xAAbAQEAAwADAQAAAAAAAAAAAAAABAUGAgMHAf/EADgRAAEDAQUDCgUDBQEAAAAAAAEAAgMEBRESITFBUWEGExQiMnGRscHRFYGh4fAHI2IkM0Jj8bL/2gAMAwEAAhEDEQA/AP4yREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREX3FHJNI2KKN0j3GzWtFyT4BTmWssVeLcNRLeno+LV5HrPH5o/jt52stBwjCKDCouCjgDXEWdIdXu8z7Nhp4K2orJlqQHO6rfzRRZqtkeQzKo2FZLxOqa2SqeyjjPJ3rP209UfxIPgrLR5MwWBpEzJqpxtrJIRby4bfG6saLRQWTSwjs3njn9lXPqpX7bu5ctPh2H00gkp6GlheBYOZE1p94C6kRWDWtaLmi5dBJOqLnqqKjqiDVUkE5bt3kYdb3roRHNDhcQvgJGiga7KWCVXERTOp3uNy6F5bbyBu0e5V3FMjVcQc/D6llQNT3cg4HW5AHYn3LQEUGezKWbVtx4ZLvZUys0Kxeuo6qhqDBVwPhkHJwtcXtcdRodRovBbRXUdLXU5gq4GTRnk4bG1rjodTqFRcx5NnpuKowvjqIrkmG3rsFuX2ufjtvus/WWLLCMUfWH1VhDWNfk7IqooiKlUxERERERERERERERERERERFccmZX9I7vEsSj+h+tFC4fX6Od+b4c/LfyyLl5lc78I10ZdTsdaKNw0kcNyerR8T5EHQ1orJssPAnlGWwepVfV1V3UYiIi1CrEXhW1VNRU7qiqmZDE3dzj8B1PguLMWNUuDUokmBklffu4gdXH+A8VmGLYnW4pUmesmc/UlrL+qy/Jo5bD3aqqtC1GUvVbm7du71KgpXS5nIK44pnqBhdHhtK6Ui4Ekvqt33AGpHuXLlzMmLYpmSnp5p2RwSF3FFHGLaMJ3NzuOqpitHZpE1+PyPcwO7uncWkj6pJaPkT8VR09oVNTUsa51wvGQyU2SCOOMkDYpHOGOYvhGPNjp6pjoHRtkbE6NpA3BBNr7gnfmmGZ7aSGYlR8P+JAbjf7J+dz5Ly7UoWCehqA08b2vY53gCCB/uKpa51ldU0tU9rXZX6ajPPavkMMcsQJC2bDq+jxCDv6Odk0d7EjcHxB1HtXSsYoK2qoKgVFHO+GQaXadx0I5jwK0vK2YYMZh4HARVbG3kj5H85vh8viraz7WZUnA/J30Pd7KJUUpizGYU4iIrhRFV815Vhr2SVdAxsVZcuc3ZsvXyPj7+ozqRj45HRyNcx7SQ5rhYgjcELbVUM/YB6TE7FqUNEsTLzt242j8rzA948rHPWtZgc0zRDPaN/HvU+lqSDgfos/REWWVoiIiIiIiIiIiIikcu4Y/FsVipG3DL8UrgbcLBufPkPEhRy0vs/w30LBRUvBE1XZ5vyYPqj5n2+Cn2bSdKnDToMyuipl5pl41Vgp4Y6enjghbwxxtDGNvewAsF6Ii3QAAuCo0XNidZDh9DLWVBIjibc2FyeQA8zYLpVC7TMQL6mDDGOBZGO9ksQfWNwAeYsLn9pRK6p6NAZNuzvXbBFzjw1VfFcQqcTrX1dW/ikdoANmjkAOQXKiLBucXkucbyVegAC4Ir12WxPENfOW+o5zGNd1I4iR8QqKtK7OYHQ5cEjiCJpnPb5aN+bSrSxWYqsHcCfT1UWtddEeK+e0iF8uXmyMaCIZ2veegILfmQs3WtZtpxU5broy7htEZL/q+tb4LJV229HhqA7eFxoXXxkcUXrSVE9JUx1NNI6OWM3a4cl5IqUEg3hTSL1ruXMUZi+FR1TdJB6krQCA14Avbw1BHmpJZlkHEvQcbbTvdaGrtGfB35J9+n7S01bmzavpUAcdRkVR1MXNPuGiIiKwXQsvzxhDcLxTvIRamqbvYLABpv6zQByFxbztyUAtazThv4VwWamaLzN+kh/XGw3G+o16rJVibWpOjz3t7Lsx6q5pJecZnqEREVWpSIiIiIiIi9IIZqiVsMET5ZHbMY0uJ9gUuxua2MbGxmNMY0ANa0SgADkApbsvpw6urKri1jibHw234je/+34q/K/s6yuehEuMi/coFRVYH4br1ln42/pz96n42/pz96tTRT/gv+1y6OmfxCyqR+ao43SSPxpjGguc5xlAAG5JUTPNNUSumnlfLI7d73FxPLcrVc4TupstV0jQCTH3evRxDT81kypbUp+jPEeMnK/NTaaTnGl11yIis+WspVGIxsq615p6V4u0D+seORF9APE+7W6hQU8lQ/BGLyu6SRsYvcVWFrmVqY0mXqKA8V+6DyHCxBd6xHsvZe2G4Vh2HD+hUkURsRxAXcQTexcdbe1SUdLUysD46eZ7TsWsJC1FBQNoCZJXi85bh4lV0kj6s4Imk7cs/Jc88Uc8L4ZWh0cjS1zTzBFiFij2uY8se0tc02IIsQVuj6OrY0ufSztaBckxkALgr6Gjro+7rKaKdtiBxtuW33sdx5hc66jZaADoni9vz8l8jdJSG6VhF+/LzWMorrmDJRYx9RhDnPsbmneddz9V3hpoddDqdlTJGPjkdHIxzHtJa5rhYgjcELLVNJLTOwyD2VjHKyQXtKMc5j2vY4tc03a4GxB6qWgmzPURNmglxiWN2z2OkcDy3Ch1pXZxO+XLvdutaGZzG26aO+bipFmwdIl5vERlsXXUv5tmK69VH8bf05+9T8bf05+9Wpor34L/ALXKD0z+IWWfjb+nP3qi62lradwdW01RC6QkgysLS489991s6qPafTtdhdLU+txxzcA6WcCT90KJW2TzcLpMZN29dsNXieG4br1nyIizisURERERERFo3ZowtwCVxbbjqHEG244Wj53VpUHkT+6lH+3/AMjlOLfUDcNNGOAVDOb5Xd6IiKYupVrtHnfFl3u22tNM1jr9NXfNoWarRu0wE4DDYbVTb/6XKhYZSPr8Qgo47h0rw24bfhHM28Bc+xY62g59XhG4XK3o7hFerJkXLsddbEq5vFTsdaKIjSQjmerR05kG+1jo9HTS1c7YYW3cdzyA6lc1PDHT08cELeGONoYxt72AFgrlgVGKShbxAiWSzn3Go6D2fzXfaldHyfoL2AGR2Q4neeA/NVZ8nLFdb9dgebo25u7tgHE+52Jh+E0tIA4tEso143DbyHL5qQRF5FV1k9ZIZJ3lx4+m75L3qioKahiEVMwNaN3rtJ4nNFx4hhtLWAl7A2Q7SN0Pt67c12IuNNVTUsglhcWuG0LnV0cFZEYqhgc07D+a8dVSsSopaGfu5NWnVjxs4f8AeSpefMBbWUrsSpIh6VELygad4wD4kfLTXRbBidI2so3wnR27D0dyVLc1zXFrgWuBsQRqCvXbCtRtu0bo5+23I+jh+fReEcqrANg1gdD/AG35jhvae7Zw4rD1eOywnhxFtzYGIgf6lX84YeMNx6eJjOGGT6WIaW4TyAGwBuPYp/ss/wDJf+r/AO1Hs2N0Ve1jtRePoVT1Lg6AuHBXhERbRU6KEzy0vytWBouQGH3PbdTa4cwf2DiH+Vk+6V0VLcUL27wfJc4zc8HiseREXni0CIiIiIiIi1PIn91KP9v/AJHKcVY7NpXyZeexzriKoc1o6CzT8yVZ1v6B2KmjPAKhnF0ju9ERFLXUoTPDHSZWrAxpcQGu0GwDwSfddVDs4gZLmPvHXvDC57bddG/JxWiVsDaqjmpXlwZNG6NxG4BFtFQOzsejZmngn+jl7h8fC7fiDmkjz0PuVFXxf10LzocvA3+qnQO/Ye1aZh7BLXQRubxNdI0EdRfVXdUvCXmPE6ZzdzIG+/T+KuixXL9zukwjZhPn/wAXqv6ZNb0Sdw1xDwuy9UREWBXpqIiIiKn48xseLThosCQ72kAn4q4Ko5i/tif9n7oW25BuPxB42YD5tXnn6lNHwyM7cY/8uWadqUTBNQTBo7xzXtceoBaQP9x967uzGBjcIqajhIkkn4SerWtFvi5y4+1NzS7Dm3HEBISPA8P8irLlWldRZeoqd5PEI+NwLbEFxLrEeF7exbyGLFakjtgH1IH3XkD3XUrRvUoiIr5QUXDmD+wcQ/ysv3Su5RWbqj0bLVdJw8V4u7t+sQ3+K6aghsTidx8lzjF7wFkqIi87WgREREREREVz7LqgNq62kPES9jZB0HCbH7w9yviyLLVcMOxylqnG0YfwyE3sGnQnTpe/sWurYWHMH0+Da0+efuqitZhkv3oiIrpQ0VDzFH+A86UuLNa0U87uJ1m7acMmg52N79Sr4o/MGGR4thctI/Rx9aN32XjY/wAD4EqFXU5mi6vaabx3hd0EgY7PQ5FSANiCD5EK64bVNrKOOcW4iLPA5O5rJMmYnIGHA8SvDXUvqsY4W4mAaWPMge8WOupV0wjEX0ExuOKF/wBdvPzHis9yisz41QtkhH7jNB5t7/bitbyQt1tiVxbOf233Andud3a38DwVwReVNUQ1MQlgkD2bXHJeq8fkjfG4seLiNQdV7zFKyVgfGQQdCMwURF8TSxwxOlleGMaLklfGtc9wa0Xkrk97WNLnG4DUr8qZmU8D5pDZrBc/yVInkdNM+V1g57i4221UhjmJmtf3MOkDTcX3cevl/wB8qdnDHGYTQOjhkHpsrfom2vwjm4/G3U+1et8mLJNkUjqmpyc7ZuGwd59gvDOWtvstiqbT0xvjZfnvJ1PcNnzKr+JRDMOfPRQ0Op6azJCARdrDdwOv2iW3Hgr8oDJWCnCcNL5wPSqizpLX9Ucm+y5v4nnYKfWks+FzGmR46zzeeG4fJYud4JDW6BERFYLoRVXtLq+6waKlbIWunl1bb6zGi5+PCrUs07Qq/wBLx007H3jpW8As644jq4+B2B/VVXa83NUrhtOX58lJpGYpRwVbREWJV0iIiIiIiIi1PJWKfhPBY+8fxVEH0ctzqbbO3J1HM7kFZYpjKWLuwjFWyPP9GlsyYXNgL/WsOY/mOasrLq+jTgu7JyPuo1VFzjMtQtXRfLHNexr2ODmuF2uBuCOq+lt1SoiIvqKv5rwJ+IcFfQPMWIQasINuMDW1+R6H2HqPPLeYn1VS3CsTgkgxFoIN2Wa+wvtyNrnpp4gKyLmmoaSWvhrnwtNTACI5NiAQQR47nfa6hPpnNl52I3X6jYfuu4SgswvHd+bl2QTSwSCSGR0buoKkosermM4XCKQ/ac3X4EKKRcauzKOsN88Ycd5GfjqpdFa9dQC6mlc0bgcvDRSr8frnMLQ2FhP5Qabj3lR9VU1FU/jnldIRtfYeQ5LyRfKSyqKkdigiDTvuz8dVyrbatCubgqJnOG4nLw0UJmrHmYLTsDYXS1Ewd3Q/JBFtXc+ew38FH5XwGd9T+G8bLpax54443j6nRxHXoOXntZZKWnkqoqqSJrpogRG468N7Xt46br2XN1KZJuckN4Gg9TvPkoQlwswtGZ1KIiKaulERERcmMV0eHYZPWyaiJlwPtO2A9psFj00j5pXyyuL3vcXOcdyTuVZ+0LGPS64YdA68FM719PrSag+7bzv4KqrG2zViebA3RvntVvRxYGYjqUREVOpiIiIiIiIiIiIivGQcwDhbhNdMb3Apnu+5f5e7oFd1iCv+TM0Cp7vDcSktP9WKZx/rPzT+d48/PfTWTaYIEEp7j6eyraum/wA2K4IiLSKuRERERZ92nzPditLTkju2QcbR4ucQfuhaCssz1L3maKuz+NreBo1vazRce+6prcfhpbt5HuplC2+W/cvTs/mfFmeBjCA2Zj2P8Rwl3zaFp6xzBJmwYzRTSP4GMnY5zugDhf4LY11WBJfC5u4+a5V7bngoiIr5QUREREVbztj4wumNHT61kzDYg27pp04vPp7/AAPtmfMlLhEboYy2atI9WPk2/N38tz8VmdXUTVdS+oqJHSSyG7nHmqK1bTETTFEesdeH3U2lpi84naLyREWSVsiIiIiIiIiIiIiIiIiIiIrdlrOM1MW02Kl88JIAnvd7B4/aHx330CvdHVU9ZTtqKWZksTxcOaf+2PgsWXVh2I1uHSmWiqZIXHcA6O33B0O53V3RW1JCAyXrD6/f8zUKaja/NuRWyoqTheemmzMSpC3/ABINRv8AZPzv7FZsPxnC68tbS10L3uJAYTwvNujTYrRwV9PP2HZ7tqrnwSM1CkFjWLzMqMVrKiIkxyzve0noXEha9iFR6LQVFVw8XcxOkt1sCbLF1TcoX5MZ3lTLPb2ii2ihqBV0MFU1paJo2yBp5XF7LF1q+TJnz5YoXyWuGFgt0a4tHwAXVyffdK9m8X+H/Vzr29UFTCLixDFMOoAfTKyGJwAPAXXdbwaNT7lW8UzzTR8TMOpnTO1HeS+q3wIG5HnZaCetgg7bh6+CgMhe/shW+WRkUbpJXtYxou5zjYAdSVTMxZ0a1pp8GN3X1qHN0A/NB+ZHLnuqri+MYhishdWVDnMvdsTdGN3tYe0i518VHrO1ttvkGGHIb9v2VhDRBub819SPfJI6SR7nvcS5znG5JO5JXyiKhU5ERERERERERERERERERERERERERERERERdEddWxU7qaOsqGQOBBjbIQ0g76bLnRF9LidSvlwCL3bV1baY0ramZsDt4hIeA+zZeCIHEaIReiIi+L6iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIv/2Q==" alt="Logo PT. WMA">
+      <div class="login-logo-text">
+        <div class="t1">PT. Wiratama Mitra Abadi</div>
+        <div class="t2">Sistem Manajemen Gudang</div>
+      </div>
+    </div>
+    <div class="login-title">Masuk ke Sistem</div>
+    <div class="login-sub">Masukkan kredensial Anda untuk melanjutkan</div>
+    <div class="lf-group">
+      <label>Username</label>
+      <input id="inp-user" placeholder="Username" autocomplete="username">
+    </div>
+    <div class="lf-group">
+      <label>Password</label>
+      <input id="inp-pass" type="password" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk</button>
+    <div class="login-err" id="login-err">Username atau password salah.</div>
+  </div>
+</div>
+
+<!-- ==================== SIDEBAR ==================== -->
+<div class="sidebar" id="sidebar" style="display:none">
+  <div class="sidebar-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo">
+    <div class="logo-texts">
+      <div class="lt1">PT. Wiratama Mitra Abadi</div>
+      <div class="lt2">Manajemen Gudang</div>
+    </div>
+  </div>
+  <div class="user-pill">
+    <div>
+      <div class="up-name" id="up-name">-</div>
+      <div class="up-role" id="up-role">-</div>
+    </div>
+    <div class="up-badge" id="up-badge">-</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Utama</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('stok',this)"><span class="nav-icon">📦</span> Stok Barang</div>
+  </div>
+  <div class="nav-section" id="nav-transaksi">
+    <div class="nav-label">Transaksi</div>
+    <div class="nav-item" onclick="showPage('masuk',this)"><span class="nav-icon">📥</span> Barang Masuk</div>
+    <div class="nav-item" onclick="showPage('keluar',this)"><span class="nav-icon">📤</span> Barang Keluar</div>
+  </div>
+  <div class="nav-section" id="nav-master">
+    <div class="nav-label">Master Data</div>
+    <div class="nav-item" onclick="showPage('master',this)"><span class="nav-icon">🗃️</span> Master Barang</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Laporan</div>
+    <div class="nav-item" onclick="exportExcel()"><span class="nav-icon">📋</span> Export Excel (CSV)</div>
+  </div>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="doLogout()">⬅ Keluar</button>
+  </div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<div class="main" id="main-area" style="display:none">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Ringkasan kondisi gudang</div>
+      </div>
+      <button class="btn success" onclick="exportExcel()">📋 Export CSV</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Jenis Barang</div><div class="stat-val blue" id="dash-total">0</div></div>
+      <div class="stat-card"><div class="stat-label">Total Unit Masuk</div><div class="stat-val green" id="dash-masuk">0</div></div>
+      <div class="stat-card"><div class="stat-label">Total Unit Keluar</div><div class="stat-val red" id="dash-keluar">0</div></div>
+      <div class="stat-card"><div class="stat-label">Total Stok Tersedia</div><div class="stat-val" id="dash-stok">0</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">⚠️ Stok Rendah / Habis</span></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kode</th><th>Brand</th><th>Model</th><th>Ukuran</th><th>Stok Akhir</th><th>Status</th></tr></thead>
+            <tbody id="dash-low-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">🕐 10 Aktivtas Terakhir</span></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal</th><th>Tipe</th><th>Kode</th><th>Brand</th><th>Model</th><th>Qty</th><th>Kondisi</th></tr></thead>
+            <tbody id="dash-recent"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOK -->
+  <div class="page" id="page-stok">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Stok Barang</div>
+        <div class="page-sub">Rekap stok real-time semua barang</div>
+      </div>
+      <button class="btn success" onclick="exportExcel()">📋 Export CSV</button>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Data Stok</span>
+        <input type="text" placeholder="Cari kode / brand / model..." id="stok-search" oninput="renderStok()" style="width:260px">
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kode</th><th>Brand</th><th>Model</th><th>Type</th><th>Ukuran</th><th>Kondisi</th><th style="text-align:right">Masuk</th><th style="text-align:right">Keluar</th><th style="text-align:right">Stok Akhir</th></tr></thead>
+            <tbody id="stok-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARANG MASUK -->
+  <div class="page" id="page-masuk">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Barang Masuk</div>
+        <div class="page-sub">Catat penerimaan barang ke gudang</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn success" onclick="exportExcel()">📋 Export CSV</button>
+        <button class="btn primary" id="btn-add-masuk" onclick="openAddMasuk()">+ Tambah Masuk</button>
+      </div>
+    </div>
+    <div id="user-note-masuk" class="user-readonly-note" style="display:none">
+      ℹ️ Mode <b>User</b>: Anda hanya dapat melihat dan mengekspor data. Penambahan/pengeditan dinonaktifkan.
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Riwayat Barang Masuk</span>
+        <input type="text" placeholder="Cari kode / brand / model..." id="masuk-search" oninput="renderMasuk()" style="width:240px">
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal</th><th>Kode</th><th>Brand</th><th>Model</th><th>Type</th><th>Ukuran</th><th style="text-align:right">Qty</th><th>Kondisi</th><th id="th-masuk-aksi">Aksi</th></tr></thead>
+            <tbody id="masuk-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARANG KELUAR -->
+  <div class="page" id="page-keluar">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Barang Keluar</div>
+        <div class="page-sub">Catat pengeluaran barang dari gudang</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn success" onclick="exportExcel()">📋 Export CSV</button>
+        <button class="btn primary" id="btn-add-keluar" onclick="openAddKeluar()">+ Tambah Keluar</button>
+      </div>
+    </div>
+    <div id="user-note-keluar" class="user-readonly-note" style="display:none">
+      ℹ️ Mode <b>User</b>: Anda hanya dapat melihat dan mengekspor data. Penambahan/pengeditan dinonaktifkan.
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Riwayat Barang Keluar</span>
+        <input type="text" placeholder="Cari kode / brand / model..." id="keluar-search" oninput="renderKeluar()" style="width:240px">
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tanggal</th><th>Kode</th><th>Brand</th><th>Model</th><th>Type</th><th></th><th style="text-align:right">Qty</th><th>Kondisi</th><th id="th-keluar-aksi">Aksi</th></tr></thead>
+            <tbody id="keluar-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MASTER BARANG -->
+  <div class="page" id="page-master">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Master Barang</div>
+        <div class="page-sub">Data induk seluruh barang gudang</div>
+      </div>
+      <button class="btn primary" id="btn-add-master" onclick="openAddMaster()">+ Tambah Barang</button>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Daftar Master Barang</span>
+        <input type="text" placeholder="Cari kode / brand / model..." id="master-search" oninput="renderMaster()" style="width:240px">
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>No</th><th>Kode</th><th>Brand</th><th>Manufacture</th><th>Model</th><th>Type</th><th>Ukuran</th><th>Kondisi</th><th id="th-master-aksi">Aksi</th></tr></thead>
+            <tbody id="master-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ==================== MODAL BARANG MASUK ==================== -->
+<div class="modal-overlay" id="modal-masuk">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-masuk-title">Tambah Barang Masuk</span>
+      <button class="close-btn" onclick="closeModal('modal-masuk')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alert-masuk" class="alert"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Kode Barang *</label><input id="m-kode" placeholder="Ketik kode barang..." oninput="autofill('m')" autocomplete="off"><div class="hint-text hint-found" id="m-hint"></div></div>
+        <div class="form-group"><label>Nomor</label><input id="m-nomor"></div>
+        <div class="form-group"><label>Ukuran</label><input id="m-Ukuran"></div>
+        <div class="form-group"><label>Brand</label><input id="m-brand"></div>
+        <div class="form-group"><label>Manufacture</label><input id="m-manufacture"></div>
+        <div class="form-group"><label>Model</label><input id="m-model"></div>
+        <div class="form-group"><label>Type</label><input id="m-type"></div>
+        <div class="form-group"><label>Display</label><input id="m-display"></div>
+        <div class="form-group"><label>Installation</label><input id="m-installation"></div>
+        <div class="form-group"><label>Power</label><input id="m-power"></div>
+        <div class="form-group"><label>Acc</label><input id="m-acc"></div>
+        <div class="form-group"><label>Pressure</label><input id="m-pressure"></div>
+        <div class="form-group"><label>Body</label><input id="m-body"></div>
+        <div class="form-group"><label>Electrode</label><input id="m-electrode"></div>
+        <div class="form-group"><label>Liner</label><input id="m-liner"></div>
+        <div class="form-group"><label>Flange Type</label><input id="m-flange_type"></div>
+        <div class="form-group"><label>Kondisi</label><select id="m-kondisi"><option>Baru</option><option>Bekas</option><option>Rusak</option><option>Rekondisi</option></select></div>
+        <div class="form-group"><label>Qty *</label><input id="m-qty" type="number" min="1" placeholder="0"></div>
+        <div class="form-group"><label>Tanggal Masuk *</label><input id="m-tanggal" type="date"></div>
+        <div class="form-group full"><label>Keterangan</label><textarea id="m-keterangan" rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-masuk')">Batal</button>
+      <button class="btn primary" onclick="saveMasuk()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL BARANG KELUAR ==================== -->
+<div class="modal-overlay" id="modal-keluar">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-keluar-title">Tambah Barang Keluar</span>
+      <button class="close-btn" onclick="closeModal('modal-keluar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alert-keluar" class="alert"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Kode Barang *</label><input id="k-kode" placeholder="Ketik kode barang..." oninput="autofillKeluar()" autocomplete="off"><div class="hint-text hint-found" id="k-stok-info"></div></div>
+        <div class="form-group"><label>Brand</label><input id="k-brand" readonly></div>
+        <div class="form-group"><label>Model</label><input id="k-model" readonly></div>
+        <div class="form-group"><label>Type</label><input id="k-type" readonly></div>
+        <div class="form-group"><label>Ukuran</label><input id="k-ukuran" readonly></div>
+        <div class="form-group"><label>Nomor</label><input id="k-nomor" readonly></div>
+        <div class="form-group"><label>Manufacture</label><input id="k-manufacture" readonly></div>
+        <div class="form-group"><label>Display</label><input id="k-display" readonly></div>
+        <div class="form-group"><label>Installation</label><input id="k-installation" readonly></div>
+        <div class="form-group"><label>Power</label><input id="k-power" readonly></div>
+        <div class="form-group"><label>Acc</label><input id="k-acc" readonly></div>
+        <div class="form-group"><label>Pressure</label><input id="k-pressure" readonly></div>
+        <div class="form-group"><label>Body</label><input id="k-body" readonly></div>
+        <div class="form-group"><label>Electrode</label><input id="k-electrode" readonly></div>
+        <div class="form-group"><label>Liner</label><input id="k-liner" readonly></div>
+        <div class="form-group"><label>Flange Type</label><input id="k-flange_type" readonly></div>
+        <div class="form-group"><label>Kondisi</label><input id="k-kondisi" readonly></div>
+        <div class="form-group"><label>Qty Keluar *</label><input id="k-qty" type="number" min="1" placeholder="0"></div>
+        <div class="form-group"><label>Tanggal Keluar *</label><input id="k-tanggal" type="date"></div>
+        <div class="form-group full"><label>Keterangan</label><textarea id="k-keterangan" rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-keluar')">Batal</button>
+      <button class="btn primary" onclick="saveKeluar()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL MASTER BARANG ==================== -->
+<div class="modal-overlay" id="modal-master">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-master-title">Tambah Barang</span>
+      <button class="close-btn" onclick="closeModal('modal-master')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alert-master" class="alert"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Kode Barang *</label><input id="b-kode"></div>
+        <div class="form-group"><label>Nomor</label><input id="b-nomor"></div>
+        <div class="form-group"><label>Ukuran</label><input id="b-ukuran"></div>
+        <div class="form-group"><label>Brand</label><input id="b-brand"></div>
+        <div class="form-group"><label>Manufacture</label><input id="b-manufacture"></div>
+        <div class="form-group"><label>Model</label><input id="b-model"></div>
+        <div class="form-group"><label>Type</label><input id="b-type"></div>
+        <div class="form-group"><label>Display</label><input id="b-display"></div>
+        <div class="form-group"><label>Installation</label><input id="b-installation"></div>
+        <div class="form-group"><label>Power</label><input id="b-power"></div>
+        <div class="form-group"><label>Acc</label><input id="b-acc"></div>
+        <div class="form-group"><label>Pressure</label><input id="b-pressure"></div>
+        <div class="form-group"><label>Body</label><input id="b-body"></div>
+        <div class="form-group"><label>Electrode</label><input id="b-electrode"></div>
+        <div class="form-group"><label>Liner</label><input id="b-liner"></div>
+        <div class="form-group"><label>Flange Type</label><input id="b-flange_type"></div>
+        <div class="form-group"><label>Kondisi</label><select id="b-kondisi"><option>Baru</option><option>Bekas</option><option>Rusak</option><option>Rekondisi</option></select></div>
+        <div class="form-group full"><label>Keterangan</label><textarea id="b-keterangan" rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-master')">Batal</button>
+      <button class="btn primary" onclick="saveMaster()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// USERS DATABASE (hardcoded)
+// ============================================================
+const USERS = {
+  'adminwarehouse1': { password: 'adminwarehouse1', role: 'admin', label: 'Admin Warehouse 1' },
+  'adminwarehouse2': { password: 'adminwarehouse2', role: 'admin', label: 'Admin Warehouse 2' },
+  'adminwarehouse3': { password: 'adminwarehouse3', role: 'admin', label: 'Admin Warehouse 3' },
+  'adminwarehouse4': { password: 'adminwarehouse4', role: 'admin', label: 'Admin Warehouse 4' },
+  'adminwarehouse5': { password: 'adminwarehouse5', role: 'admin', label: 'Admin Warehouse 5' },
+  'user1': { password: 'user1', role: 'user', label: 'User 1' },
+  'user2': { password: 'user2', role: 'user', label: 'User 2' },
+  'user3': { password: 'user3', role: 'user', label: 'User 3' },
+  'user4': { password: 'user4', role: 'user', label: 'User 4' },
+  'user5': { password: 'user5', role: 'user', label: 'User 5' },
+};
+
+// ============================================================
+// SESSION
+// ============================================================
+let currentUser = null;
+
+function doLogin() {
+  const u = document.getElementById('inp-user').value.trim();
+  const p = document.getElementById('inp-pass').value;
+  const acc = USERS[u];
+  if (acc && acc.password === p) {
+    currentUser = { username: u, role: acc.role, label: acc.label };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('sidebar').style.display = 'flex';
+    document.getElementById('main-area').style.display = 'block';
+    applyRoleUI();
+    renderAll();
+  } else {
+    document.getElementById('login-err').classList.add('show');
+  }
+}
+
+document.getElementById('inp-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('inp-user').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('inp-pass').focus(); });
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('main-area').style.display = 'none';
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+  document.getElementById('login-err').classList.remove('show');
+}
+
+function isAdmin() { return currentUser && currentUser.role === 'admin'; }
+
+function applyRoleUI() {
+  const u = currentUser;
+  document.getElementById('up-name').textContent  = u.label;
+  document.getElementById('up-role').textContent  = u.role === 'admin' ? 'Administrator' : 'View Only';
+  document.getElementById('up-badge').textContent = u.role === 'admin' ? 'ADMIN' : 'USER';
+
+  // hide add/edit buttons for user role
+  const adminOnly = ['btn-add-masuk','btn-add-keluar','btn-add-master'];
+  adminOnly.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isAdmin() ? '' : 'none';
+  });
+
+  // show user notes
+  ['user-note-masuk','user-note-keluar'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isAdmin() ? 'none' : 'block';
+  });
+
+  // hide aksi column headers for user
+  ['th-masuk-aksi','th-keluar-aksi','th-master-aksi'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isAdmin() ? '' : 'none';
+  });
+}
+
+// ============================================================
+// LOCAL STORAGE DATABASE
+// ============================================================
+const DB = {
+  getBarang()  { return JSON.parse(localStorage.getItem('wma_barang')  || '{}') },
+  getMasuk()   { return JSON.parse(localStorage.getItem('wma_masuk')   || '[]') },
+  getKeluar()  { return JSON.parse(localStorage.getItem('wma_keluar')  || '[]') },
+  getStok()    { return JSON.parse(localStorage.getItem('wma_stok')    || '{}') },
+  saveBarang(d)  { localStorage.setItem('wma_barang',  JSON.stringify(d)) },
+  saveMasuk(d)   { localStorage.setItem('wma_masuk',   JSON.stringify(d)) },
+  saveKeluar(d)  { localStorage.setItem('wma_keluar',  JSON.stringify(d)) },
+  saveStok(d)    { localStorage.setItem('wma_stok',    JSON.stringify(d)) },
+};
+
+// ============================================================
+// NAV
+// ============================================================
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  else if(id==='stok')   renderStok();
+  else if(id==='masuk')  renderMasuk();
+  else if(id==='keluar') renderKeluar();
+  else if(id==='master') renderMaster();
+}
+
+function renderAll() {
+  renderDashboard();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function uid() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+function badge(t,c) { return `<span class="badge ${c}">${t}</span>`; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function showAlert(id, msg, type='danger') {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = `alert ${type} show`;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+function gv(id) { return (document.getElementById(id)||{}).value||''; }
+function sv(id,v) { const el = document.getElementById(id); if(el) el.value = v||''; }
+
+const FIELDS = ['nomor','ukuran','brand','manufacture','model','type','display','installation','power','acc','pressure','body','electrode','liner','flange_type','kondisi','keterangan'];
+
+// ============================================================
+// AUTOFILL
+// ============================================================
+function autofill(pfx) {
+  const kode  = gv(pfx+'-kode').trim();
+  const hint  = document.getElementById(pfx+'-hint');
+  const barang = DB.getBarang();
+  if(barang[kode]) {
+    const b = barang[kode];
+    FIELDS.forEach(f => sv(pfx+'-'+f, b[f]||''));
+    if(hint) hint.textContent = '✓ Data ditemukan dari master';
+  } else {
+    if(hint) hint.textContent = kode ? 'Barang baru — isi data manual' : '';
+  }
+}
+
+function autofillKeluar() {
+  const kode  = gv('k-kode').trim();
+  const stok  = DB.getStok();
+  const info  = document.getElementById('k-stok-info');
+  if(stok[kode]) {
+    const s = stok[kode];
+    ['brand','manufacture','model','type','ukuran','nomor','display','installation','power','acc','pressure','body','electrode','liner','flange_type','kondisi'].forEach(f => sv('k-'+f, s[f]||''));
+    info.textContent = `✓ Stok tersedia: ${s.stok_akhir}`;
+    info.style.color = s.stok_akhir > 0 ? 'var(--grt)' : 'var(--rdt)';
+  } else {
+    ['brand','manufacture','model','type','ukuran','nomor','display','installation','power','acc','pressure','body','electrode','liner','flange_type','kondisi'].forEach(f => sv('k-'+f,''));
+    info.textContent = kode ? '⚠ Kode tidak ditemukan di stok' : '';
+    info.style.color = 'var(--rdt)';
+  }
+}
+
+// ============================================================
+// STOK ENGINE
+// ============================================================
+function recalcStok() {
+  const masuk  = DB.getMasuk();
+  const keluar = DB.getKeluar();
+  const barang = DB.getBarang();
+  const stok   = {};
+
+  masuk.forEach(x => {
+    const k = x.kode;
+    if(!stok[k]) stok[k] = { ...( barang[k] || {} ), kode:k, total_masuk:0, total_keluar:0, stok_akhir:0 };
+    stok[k].total_masuk += Number(x.qty)||0;
+    stok[k].stok_akhir  += Number(x.qty)||0;
+  });
+  keluar.forEach(x => {
+    const k = x.kode;
+    if(!stok[k]) stok[k] = { ...( barang[k] || {} ), kode:k, total_masuk:0, total_keluar:0, stok_akhir:0 };
+    stok[k].total_keluar += Number(x.qty)||0;
+    stok[k].stok_akhir  -= Number(x.qty)||0;
+  });
+
+  DB.saveStok(stok);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  recalcStok();
+  const stok   = DB.getStok();
+  const masuk  = DB.getMasuk();
+  const keluar = DB.getKeluar();
+  const keys   = Object.keys(stok);
+
+  document.getElementById('dash-total').textContent  = keys.length;
+  document.getElementById('dash-masuk').textContent  = masuk.reduce((a,x)  => a + (Number(x.qty)||0), 0);
+  document.getElementById('dash-keluar').textContent = keluar.reduce((a,x) => a + (Number(x.qty)||0), 0);
+  document.getElementById('dash-stok').textContent   = keys.reduce((a,k)   => a + (stok[k].stok_akhir||0), 0);
+
+  const lowKeys = keys.filter(k => (stok[k].stok_akhir||0) <= 3);
+  const lowTbl  = document.getElementById('dash-low-table');
+  lowTbl.innerHTML = lowKeys.length ? lowKeys.map(k => {
+    const s = stok[k];
+    const sb = s.stok_akhir === 0 ? badge('Habis','red') : badge('Rendah','amber');
+    return `<tr class="${s.stok_akhir===0?'stok-low':''}"><td>${s.kode||k}</td><td>${s.brand||'-'}</td><td>${s.model||'-'}</td><td>${s.ukuran||'-'}</td><td><b>${s.stok_akhir}</b></td><td>${sb}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--tx2)">Semua stok aman ✓</td></tr>';
+
+  const all = [
+    ...masuk.map(x  => ({...x,  tipe:'Masuk',  tgl: x.tanggal_masuk})),
+    ...keluar.map(x => ({...x, tipe:'Keluar', tgl: x.tanggal_keluar}))
+  ].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,10);
+
+  document.getElementById('dash-recent').innerHTML = all.length
+    ? all.map(x => `<tr><td>${x.tgl}</td><td>${badge(x.tipe,x.tipe==='Masuk'?'green':'red')}</td><td>${x.kode}</td><td>${x.brand||'-'}</td><td>${x.model||'-'}</td><td><b>${x.qty}</b></td><td>${x.kondisi||'-'}</td></tr>`).join('')
+    : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--tx2)">Belum ada transaksi</td></tr>';
+}
+
+// ============================================================
+// STOK PAGE
+// ============================================================
+function renderStok() {
+  recalcStok();
+  const stok = DB.getStok();
+  const q    = gv('stok-search');
+  const keys = Object.keys(stok).filter(k => {
+    if(!q) return true;
+    const s = stok[k];
+    return [s.kode||k,s.brand,s.model,s.type,s.ukuran].join(' ').toLowerCase().includes(q.toLowerCase());
+  });
+  const tbl = document.getElementById('stok-table');
+  tbl.innerHTML = keys.length ? keys.map(k => {
+    const s = stok[k];
+    const cb = s.kondisi === 'Baru' ? badge(s.kondisi||'-','green') : s.kondisi === 'Rusak' ? badge(s.kondisi,'red') : badge(s.kondisi||'-','blue');
+    return `<tr class="${s.stok_akhir===0?'stok-low':s.stok_akhir>0?'stok-ok':''}">
+      <td><b>${s.kode||k}</b></td><td>${s.brand||'-'}</td><td>${s.model||'-'}</td><td>${s.type||'-'}</td>
+      <td>${s.ukuran||'-'}</td><td>${cb}</td>
+      <td style="text-align:right;color:var(--grt)">${s.total_masuk||0}</td>
+      <td style="text-align:right;color:var(--rdt)">${s.total_keluar||0}</td>
+      <td style="text-align:right"><b>${s.stok_akhir||0}</b></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--tx2)">Belum ada data stok</td></tr>';
+}
+
+// ============================================================
+// BARANG MASUK
+// ============================================================
+let editingMasukId = null;
+
+function openAddMasuk() {
+  if(!isAdmin()) return;
+  editingMasukId = null;
+  document.getElementById('modal-masuk-title').textContent = 'Tambah Barang Masuk';
+  ['kode','nomor','Ukuran','brand','manufacture','model','type','display','installation','power','acc','pressure','body','electrode','liner','flange_type','keterangan'].forEach(f => sv('m-'+f,''));
+  sv('m-kondisi','Baru'); sv('m-qty',''); sv('m-tanggal', new Date().toISOString().split('T')[0]);
+  document.getElementById('m-hint').textContent = '';
+  openModal('modal-masuk');
+}
+
+function editMasuk(id) {
+  if(!isAdmin()) return;
+  const data = DB.getMasuk();
+  const x = data.find(d => d.id === id);
+  if(!x) return;
+  editingMasukId = id;
+  document.getElementById('modal-masuk-title').textContent = 'Edit Barang Masuk';
+  sv('m-kode', x.kode); sv('m-qty', x.qty); sv('m-tanggal', x.tanggal_masuk);
+  FIELDS.forEach(f => sv('m-'+f, x[f]||''));
+  openModal('modal-masuk');
+}
+
+function saveMasuk() {
+  if(!isAdmin()) return;
+  const kode = gv('m-kode').trim();
+  const qty  = parseInt(gv('m-qty'));
+  const tgl  = gv('m-tanggal');
+  if(!kode || !qty || qty<1 || !tgl) return showAlert('alert-masuk','Kode, Qty, dan Tanggal wajib diisi!');
+  const data = DB.getMasuk();
+  const obj  = { id: editingMasukId || uid(), kode, qty, tanggal_masuk: tgl, created_at: new Date().toISOString() };
+  FIELDS.forEach(f => obj[f] = gv('m-'+f));
+
+  // update master barang
+  const barang = DB.getBarang();
+  if(!barang[kode]) { barang[kode] = {kode}; FIELDS.forEach(f => barang[kode][f] = obj[f]); DB.saveBarang(barang); }
+
+  if(editingMasukId) {
+    const i = data.findIndex(d => d.id === editingMasukId);
+    if(i>=0) data[i] = obj;
+  } else {
+    data.push(obj);
+  }
+  DB.saveMasuk(data);
+  recalcStok();
+  closeModal('modal-masuk');
+  renderMasuk();
+  renderDashboard();
+}
+
+function deleteMasuk(id) {
+  if(!isAdmin()) return;
+  if(!confirm('Hapus data barang masuk ini?')) return;
+  DB.saveMasuk(DB.getMasuk().filter(d => d.id !== id));
+  recalcStok(); renderMasuk(); renderDashboard();
+}
+
+function renderMasuk() {
+  const data = DB.getMasuk();
+  const q    = gv('masuk-search');
+  const filtered = data.filter(x => !q || [x.kode,x.brand,x.model].join(' ').toLowerCase().includes(q.toLowerCase()));
+  const tbl = document.getElementById('masuk-table');
+  const showAksi = isAdmin();
+  tbl.innerHTML = filtered.length
+    ? [...filtered].reverse().map(x =>
+      `<tr><td>${x.tanggal_masuk}</td><td>${x.kode}</td><td>${x.brand||'-'}</td><td>${x.model||'-'}</td><td>${x.type||'-'}</td><td>${x.ukuran||'-'}</td>
+      <td style="text-align:right"><b>${x.qty}</b></td><td>${x.kondisi||'-'}</td>
+      <td class="actions">${showAksi ? `<button class="btn sm" onclick="editMasuk('${x.id}')">✎ Edit</button><button class="btn sm danger" onclick="deleteMasuk('${x.id}')">✕ Hapus</button>` : ''}</td></tr>`
+    ).join('')
+    : '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--tx2)">Belum ada data</td></tr>';
+}
+
+// ============================================================
+// BARANG KELUAR
+// ============================================================
+let editingKeluarId = null;
+
+function openAddKeluar() {
+  if(!isAdmin()) return;
+  editingKeluarId = null;
+  document.getElementById('modal-keluar-title').textContent = 'Tambah Barang Keluar';
+  ['kode','brand','manufacture','model','type','Ukuran','nomor','display','installation','power','acc','pressure','body','electrode','liner','flange_type','kondisi','keterangan'].forEach(f => sv('k-'+f,''));
+  sv('k-qty',''); sv('k-tanggal', new Date().toISOString().split('T')[0]);
+  document.getElementById('k-stok-info').textContent = '';
+  openModal('modal-keluar');
+}
+
+function editKeluar(id) {
+  if(!isAdmin()) return;
+  const data = DB.getKeluar();
+  const x = data.find(d => d.id === id);
+  if(!x) return;
+  editingKeluarId = id;
+  document.getElementById('modal-keluar-title').textContent = 'Edit Barang Keluar';
+  sv('k-kode', x.kode); sv('k-qty', x.qty); sv('k-tanggal', x.tanggal_keluar);
+  ['brand','manufacture','model','type','Ukuran','nomor','display','installation','power','acc','pressure','body','electrode','liner','flange_type','kondisi','keterangan'].forEach(f => sv('k-'+f, x[f]||''));
+  openModal('modal-keluar');
+}
+
+function saveKeluar() {
+  if(!isAdmin()) return;
+  const kode = gv('k-kode').trim();
+  const qty  = parseInt(gv('k-qty'));
+  const tgl  = gv('k-tanggal');
+  if(!kode || !qty || qty<1 || !tgl) return showAlert('alert-keluar','Kode, Qty, dan Tanggal wajib diisi!');
+
+  // cek stok
+  const stok = DB.getStok();
+  const s    = stok[kode];
+  if(!editingKeluarId) {
+    if(!s || s.stok_akhir < qty) return showAlert('alert-keluar',`Stok tidak mencukupi! Tersedia: ${s ? s.stok_akhir : 0}`);
+  }
+  const data = DB.getKeluar();
+  const obj  = { id: editingKeluarId || uid(), kode, qty, tanggal_keluar: tgl, created_at: new Date().toISOString() };
+  ['brand','manufacture','model','type','Ukuran','nomor','display','installation','power','acc','pressure','body','electrode','liner','flange_type','kondisi','keterangan'].forEach(f => obj[f] = gv('k-'+f));
+
+  if(editingKeluarId) {
+    const i = data.findIndex(d => d.id === editingKeluarId);
+    if(i>=0) data[i] = obj;
+  } else {
+    data.push(obj);
+  }
+  DB.saveKeluar(data);
+  recalcStok(); closeModal('modal-keluar'); renderKeluar(); renderDashboard();
+}
+
+function deleteKeluar(id) {
+  if(!isAdmin()) return;
+  if(!confirm('Hapus data barang keluar ini?')) return;
+  DB.saveKeluar(DB.getKeluar().filter(d => d.id !== id));
+  recalcStok(); renderKeluar(); renderDashboard();
+}
+
+function renderKeluar() {
+  const data = DB.getKeluar();
+  const q    = gv('keluar-search');
+  const filtered = data.filter(x => !q || [x.kode,x.brand,x.model].join(' ').toLowerCase().includes(q.toLowerCase()));
+  const tbl = document.getElementById('keluar-table');
+  const showAksi = isAdmin();
+  tbl.innerHTML = filtered.length
+    ? [...filtered].reverse().map(x =>
+      `<tr><td>${x.tanggal_keluar}</td><td>${x.kode}</td><td>${x.brand||'-'}</td><td>${x.model||'-'}</td><td>${x.type||'-'}</td><td>${x.Ukuran||'-'}</td>
+      <td style="text-align:right"><b>${x.qty}</b></td><td>${x.kondisi||'-'}</td>
+      <td class="actions">${showAksi ? `<button class="btn sm" onclick="editKeluar('${x.id}')">✎ Edit</button><button class="btn sm danger" onclick="deleteKeluar('${x.id}')">✕ Hapus</button>` : ''}</td></tr>`
+    ).join('')
+    : '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--tx2)">Belum ada data</td></tr>';
+}
+
+// ============================================================
+// MASTER BARANG
+// ============================================================
+let editingMasterKode = null;
+
+function openAddMaster() {
+  if(!isAdmin()) return;
+  editingMasterKode = null;
+  document.getElementById('modal-master-title').textContent = 'Tambah Barang';
+  ['kode','nomor','Ukuran','brand','manufacture','model','type','display','installation','power','acc','pressure','body','electrode','liner','flange_type','keterangan'].forEach(f => sv('b-'+f,''));
+  sv('b-kondisi','Baru');
+  document.getElementById('b-kode').removeAttribute('readonly');
+  openModal('modal-master');
+}
+
+function editMasterItem(kode) {
+  if(!isAdmin()) return;
+  const barang = DB.getBarang();
+  const b = barang[kode];
+  if(!b) return;
+  editingMasterKode = kode;
+  document.getElementById('modal-master-title').textContent = 'Edit Barang';
+  sv('b-kode', kode);
+  document.getElementById('b-kode').setAttribute('readonly','');
+  FIELDS.forEach(f => sv('b-'+f, b[f]||''));
+  openModal('modal-master');
+}
+
+function saveMaster() {
+  if(!isAdmin()) return;
+  const kode = gv('b-kode').trim();
+  if(!kode) return showAlert('alert-master','Kode Barang wajib diisi!');
+  const barang = DB.getBarang();
+  if(!editingMasterKode && barang[kode]) return showAlert('alert-master','Kode sudah ada!');
+  const obj = { kode };
+  FIELDS.forEach(f => obj[f] = gv('b-'+f));
+  barang[kode] = obj;
+  DB.saveBarang(barang);
+  closeModal('modal-master'); renderMaster();
+}
+
+function deleteMasterItem(kode) {
+  if(!isAdmin()) return;
+  if(!confirm(`Hapus barang "${kode}"?`)) return;
+  const barang = DB.getBarang();
+  delete barang[kode]; DB.saveBarang(barang);
+  renderMaster();
+}
+
+function renderMaster() {
+  const barang = DB.getBarang();
+  const q      = gv('master-search');
+  const keys   = Object.keys(barang).filter(k => !q || [k,barang[k].brand,barang[k].model].join(' ').toLowerCase().includes(q.toLowerCase()));
+  const tbl    = document.getElementById('master-table');
+  const showAksi = isAdmin();
+  tbl.innerHTML = keys.length ? keys.map((k,i) => {
+    const b = barang[k];
+    return `<tr>
+      <td style="color:var(--tx2)">${i+1}</td>
+      <td><b>${b.kode||k}</b></td><td>${b.brand||'-'}</td><td>${b.manufacture||'-'}</td>
+      <td>${b.model||'-'}</td><td>${b.type||'-'}</td><td>${b.Ukuran||'-'}</td><td>${b.kondisi||'-'}</td>
+      <td class="actions">${showAksi ? `<button class="btn sm" onclick="editMasterItem('${k}')">✎ Edit</button><button class="btn sm danger" onclick="deleteMasterItem('${k}')">✕ Hapus</button>` : ''}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--tx2)">Belum ada data master</td></tr>';
+}
+
+// ============================================================
+// EXPORT CSV
+// ============================================================
+function exportExcel() {
+  recalcStok();
+  const stok   = DB.getStok();
+  const masuk  = DB.getMasuk();
+  const keluar = DB.getKeluar();
+  const tgl    = new Date().toLocaleDateString('id-ID');
+
+  let csv = `LAPORAN GUDANG - PT. WIRATAMA MITRA ABADI\r\nTanggal Export: ${tgl}\r\nDiexport oleh: ${currentUser ? currentUser.label : '-'}\r\n\r\n`;
+  csv += `=== REKAP STOK BARANG ===\r\n`;
+  csv += `Kode,Brand,Manufacture,Model,Type,Ukuran,Kondisi,Total Masuk,Total Keluar,Stok Akhir\r\n`;
+  Object.keys(stok).forEach(k => {
+    const s = stok[k];
+    csv += [s.kode||k,s.brand,s.manufacture,s.model,s.type,s.Ukuran,s.kondisi,s.total_masuk||0,s.total_keluar||0,s.stok_akhir||0].map(v=>`"${v||''}"`).join(',')+'\r\n';
+  });
+  csv += `\r\n=== BARANG MASUK ===\r\n`;
+  csv += `Tanggal,Kode,Brand,Model,Type,Ukuran,Qty,Kondisi,Keterangan\r\n`;
+  masuk.forEach(x => { csv += [x.tanggal_masuk,x.kode,x.brand,x.model,x.type,x.Ukuran,x.qty,x.kondisi,x.keterangan].map(v=>`"${v||''}"`).join(',')+'\r\n'; });
+  csv += `\r\n=== BARANG KELUAR ===\r\n`;
+  csv += `Tanggal,Kode,Brand,Model,Type,Ukuran,Qty,Kondisi,Keterangan\r\n`;
+  keluar.forEach(x => { csv += [x.tanggal_keluar,x.kode,x.brand,x.model,x.type,x.Ukuran,x.qty,x.kondisi,x.keterangan].map(v=>`"${v||''}"`).join(',')+'\r\n'; });
+
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `Laporan_WMA_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
